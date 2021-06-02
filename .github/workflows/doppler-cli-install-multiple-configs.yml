@@ -1,0 +1,21 @@
+name: Doppler CLI with Multiple Configs
+on: [workflow_dispatch]
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Doppler CLI
+        uses: dopplerhq/cli-action@v1
+
+      - name: Run Integration Tests
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN_INTEGRATION_TESTS }}
+        run: doppler run -- printenv # Testing only!
+      
+      - name: Run End-to-End Tests
+        env:
+          DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN_E2E_TESTS }}
+        run: doppler run -- printenv # Testing only!
