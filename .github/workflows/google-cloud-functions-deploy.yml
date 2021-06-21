@@ -1,0 +1,26 @@
+name: GCP Functions Deploy Doppler Env File
+on: [workflow_dispatch]
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Doppler CLI
+        uses: dopplerhq/cli-action@v1
+
+      - id: env_file
+        run: doppler secrets download --no-file --format yaml > doppler_env.yaml
+        env:
+          DOPPLER_TOKEN: ${{ secrets.GCLOUD_FUNCTION_DOPPLER_TOKEN }}
+
+      - id: deploy
+        uses: google-github-actions/deploy-cloud-functions@main
+        with:
+          name: doppler-test
+          entry_point: dopplerTest
+          runtime: nodejs14
+          source_dir: gcloud-function
+          credentials: ${{ secrets.GCP_FUNCTIONS_SA_KEY }}
+          env_vars_file: doppler_env.yaml
